@@ -1,63 +1,50 @@
 # APPUiO - OpenShift 4 Techlab
 
-Dieses Techlab basiert auf OpenShift 4.
+This tech lab is based on OpenShift 4.
 
-## Einführung
+## Introduction
 
-Mit Platform-as-a-Service (PaaS) ändert sich die Art, wie wir Software entwickeln. Puzzle stellt OpenShift – die _Container Platform_ von Red Hat – in einem Techlab vor. Entwickler lernen dabei hands-on die wichtigsten Schritte, wie eine Applikation auf OpenShift gebracht wird.
+Platform-as-a-Service (PaaS) is changing the way we develop software. Puzzle introduces OpenShift - Red Hat's _Container Platform_ - in a Techlab. Developers learn hands-on the most important steps to bring an application onto OpenShift.
 
-__Ziele dieses Techlabs__:
+__Goals of this Techlab__:
 
-- Gemeinsam den Einstieg in eine neue moderne Technologie erreichen
-- Grundkonzepte verstehen
-- Erste Applikation auf OpenShift deployed
+- Achieving entry into a new modern technology together
+- Understanding basic concepts
+- Your first application deployed on OpenShift
 
 ## Labs
-
-1. [Quicktour durch OpenShift 4](labs/01_quicktour.md)
-2. [OpenShift CLI installieren](labs/02_cli.md)
-3. [Erste Schritte auf der Lab Plattform](labs/03_first_steps.md)
-4. [Ein Container Image deployen](labs/04_deploy_dockerimage.md)
-5. [Routen erstellen](labs/05_create_route.md)
-6. [Skalieren](labs/06_scale.md)
+1. [Quick tour throughOpenShift 4](labs/01_quicktour.md)
+2. [OpenShift CLI installation](labs/02_cli.md)
+3. [First Steps on the platform](labs/03_first_steps.md)
+4. [Deploy a Container Image](labs/04_deploy_dockerimage.md)
+5. [Create routes](labs/05_create_route.md)
+6. [Scale](labs/06_scale.md)
 7. [Operators](labs/07_operators.md)
 8. [Troubleshooting](labs/08_troubleshooting_ops.md)
-9. [Datenbank deployen und anbinden](labs/09_database.md)
-10. [Persistent Storage anbinden und verwenden für Datenbank](labs/10_persistent_storage.md)
-11. [Code Änderungen via Webhook direkt integrieren](labs/11_dockerbuild_webhook.md)
+9. [Database deployment and connection](labs/09_database.md)
+10. [Persistent Storage connection and usage for the Database](labs/10_persistent_storage.md)
+11. [Code changes integration via Webhook](labs/11_dockerbuild_webhook.md)
 12. [Applikationstemplates](labs/12_template.md)
-13. [Eigene Templates erstellen](labs/13_template_creation.md)
+13. [Build your own Templates](labs/13_template_creation.md)
 
-### Zusätzliche Labs
+### Additional Labs
 
 - [Cron Jobs in OpenShift](additional-labs/cronjobs_and_jobs.md)
 - [ConfigMaps](additional-labs/configmaps.md)
 - [Jenkins](additional-labs/jenkins.md)
-- [Eigene OpenShift Entwicklungsumgebung](additional-labs/development_environment.md)
+- [Your OpenShift Development enviromnet](additional-labs/development_environment.md)
 
 ### OpenShift Developer Techlab
 
-Unterlagen für ein zweitägiges Developer Techlab sind im Verzeichnis [dev-labs](dev-labs/) abgelegt.
+Documentation for a two-day Developer Techlab is stored in the [dev-labs](dev-labs/) directory.
 
-## Weiterführende Dokumentation
+## Additional documentation
 
-- [OpenShift Container Platform 4 Dokumentation](https://docs.openshift.com/container-platform/latest/welcome/index.html)
-- [APPUiO Dokumentation](http://docs.appuio.ch)
+- [OpenShift Container Platform 4 documentation](https://docs.openshift.com/container-platform/latest/welcome/index.html)
+- [APPUiO documentation](http://docs.appuio.ch)
 
 ### APPUiO Examples
 
 - [APPUiO PHP Source to image hello World Example](https://github.com/appuio/example-php-sti-helloworld)
 - [APPUiO PHP Dockerbuild hello World Example](https://github.com/appuio/example-php-docker-helloworld)
 - [APPUiO Cron Job Example](https://github.com/appuio/example-cron-traditional)
-
-## Ältere Inhalte
-
-Die Techlabs zu früheren Versionen sind in deren eigenen Branches zu finden:
-
-- [Branch lab-3.11](https://github.com/appuio/techlab/tree/lab-3.11)
-- [Branch lab-3.9](https://github.com/appuio/techlab/tree/lab-3.9)
-- [Branch lab-3.5](https://github.com/appuio/techlab/tree/lab-3.5)
-- [Branch lab-3.4](https://github.com/appuio/techlab/tree/lab-3.4)
-- [Branch lab-3.3](https://github.com/appuio/techlab/tree/lab-3.3)
-- [Branch lab-3.2](https://github.com/appuio/techlab/tree/lab-3.2)
-- [Branch lab-3.1](https://github.com/appuio/techlab/tree/lab-3.1)

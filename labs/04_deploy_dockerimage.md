@@ -1,62 +1,62 @@
-# Lab 4: Ein Container Image deployen
+# Lab 4: Deploy a Container Image
 
-In diesem Lab werden wir gemeinsam das erste "pre-built" Container Image deployen und die OpenShift-Konzepte Pod, Service, DeploymentConfig und ImageStream etwas genauer anschauen.
+In this lab we will deploy the first "pre-built" container image together and take a closer look at the OpenShift concepts Pod, Service, DeploymentConfig and ImageStream.
 
-## Aufgabe 1: Container Image deployen
+## Task 1: Deploy a Container Image 
 
-Nachdem wir im [Lab 3](03_first_steps.md) den Source-to-Image Workflow verwendet haben, um eine Applikation auf OpenShift zu deployen, wenden wir uns nun dem Deployment eines pre-built Container Image von Docker Hub (oder einer anderen Image Registry) zu.
+Having used the source-to-image workflow to deploy an application to OpenShift in [Lab 3](03_first_steps.md), we now turn to deploying a pre-built container image from Docker Hub (or another image registry).
 
-Erstellen Sie hierfür wieder ein neues Projekt mit dem Namen `[USERNAME]-dockerimage`.
+To do this, again create a new project named `[USERNAME]-dockerimage`.
 
-<details><summary><b>Tipp</b></summary>oc new-project [USERNAME]-dockerimage</details><br/>
+<details><summary><b>Hint</b></summary>oc new-project [USERNAME]-dockerimage</details><br/>
 
-`oc new-project` wechselt automatisch in das neu angelegte Projekt. Mit dem `oc project` Befehl kann das Projekt gewechselt werden.
+`oc new-project` automatically switches to the newly created project. The `oc project` command can be used to change the project.
 
-Verwenden Sie
+Use
 
 ```bash
 oc get projects
 ```
 
-um alle Projekte anzuzeigen, auf die Sie berechtigt sind.
+to display all projects to which you are entitled.
 
-Sobald das neue Projekt erstellt wurde, können wir in OpenShift mit dem folgenden Befehl das Container Image deployen:
+Once the new project is created, we can deploy the container image in OpenShift using the following command:
 
 ```bash
 oc new-app quay.io/appuio/example-spring-boot --as-deployment-config
 ```
 
-Für unser Lab verwenden wir ein APPUiO-Beispiel (Java Spring Boot Applikation):
+For our lab, we use an APPUiO (Java Spring Boot application) example:
 
 - GitHub (Source): <https://github.com/appuio/example-spring-boot-helloworld>
 - Quay.io: <https://quay.io/appuio/example-spring-boot/>
 
-Beim Ausführen obigen Befehls legt OpenShift die nötigen Ressourcen an, lädt das Container Image (in diesem Fall von Docker Hub) herunter und deployt anschliessend den Pod.
+When running the above command, OpenShift creates the necessary resources, downloads the container image (in this case from Docker Hub) and then deploys the Pod.
 
-__Tipp__: Verwenden Sie `oc status` um sich einen Überblick über das Projekt zu verschaffen.
+__Hint__: Use `oc status` to get an overview of the project.
 
-Oder verwenden Sie den `oc get` Befehl mit dem `-w` Parameter, um fortlaufend Änderungen an den Ressourcen des Typs Pod anzuzeigen (abbrechen mit ctrl+c):
+Or use the `oc get` command with the `-w` parameter to continuously display changes to the pod type resources (cancel with ctrl+c):
 
 ```bash
 oc get pods -w
 ```
 
-Je nach Internetverbindung oder abhängig davon, ob das Image auf Ihrem OpenShift Node bereits heruntergeladen wurde, kann das eine Weile dauern.
-In der Zwischenzeit können Sie sich in der Web Console den aktuellen Status des Deployments anschauen:
+Depending on your Internet connection or whether the image has already been downloaded on your OpenShift Node, this may take a while.
+In the meantime, you can view the current status of the deployment in the Web Console:
 
-1. Loggen Sie sich in der Web Console ein
-1. Wechseln Sie von der Administrator- in die Developer-Ansicht (oben links)
-1. Wählen Sie Ihr Projekt `[USERNAME]-dockerimage` aus
-1. Klicken Sie auf Topology
+1. Log in to the Web Console
+1. Switch from the Administrator view to the Developer view (top left)
+1. Select your project `[USERNAME]-dockerimage`.
+1. Click on Topology
 
-__Tipp__:
-Um Ihre eigenen Container Images für OpenShift zu erstellen, sollten Sie die folgenden Best Practices befolgen:
+__Hint__:
+To create your own container images for OpenShift, you should follow these best practices:
 <https://docs.openshift.com/container-platform/latest/openshift_images/create-images.html>
 
-## Betrachten der erstellten Ressourcen
+## Viewing the created resources
 
-Als wir vorhin `oc new-app quay.io/appuio/example-spring-boot` ausführten, hat OpenShift im Hintergrund einige Ressourcen für uns angelegt.
-Diese werden dafür benötigt, das Container Image zu deployen:
+When we ran `oc new-app quay.io/appuio/example-spring-boot` earlier, OpenShift created some resources for us in the background.
+These are needed to deploy the container image:
 
 - Service
 - [ImageStream](https://docs.openshift.com/container-platform/latest/openshift_images/index.html#about-containers-images-and-image-streams)
@@ -64,17 +64,17 @@ Diese werden dafür benötigt, das Container Image zu deployen:
 
 ### Service
 
-Services dienen innerhalb OpenShift als Abstraktionslayer, Einstiegspunkt und Proxy/Loadbalancer auf die dahinterliegenden Pods.
-Der Service ermöglicht es, innerhalb OpenShift eine Gruppe von Pods des gleichen Typs zu finden und anzusprechen.
+Services serve as abstraction layer, entry point and proxy/load balancer to the underlying pods within OpenShift.
+The service enables a group of pods of the same type to be found and addressed within OpenShift.
 
-Als Beispiel: Wenn eine Applikationsinstanz unseres Beispiels die Last nicht mehr alleine verarbeiten kann, können wir die Applikation bspw. auf drei Pods hochskalieren.
-OpenShift mapt diese als Endpoints automatisch zum Service.
-Sobald die Pods bereit sind, werden Requests automatisch auf alle drei Pods verteilt.
+As an example: If an application instance in our example can no longer handle the load on its own, we can scale up the application to three pods, for example.
+OpenShift automatically maps these to the service as endpoints.
+Once the pods are ready, requests are automatically distributed to all three pods.
 
-__Note__: Die Applikation kann aktuell von aussen noch nicht erreicht werden, der Service ist ein OpenShift-internes Konzept.
-Im folgenden Lab werden wir die Applikation öffentlich verfügbar machen.
+__Note__: The application is currently not accessible from the outside, the service is an OpenShift internal concept.
+In the following lab we will make the application publicly available.
 
-Nun schauen wir uns unseren Service mal etwas genauer an:
+Now let's take a closer look at our service:
 
 ```bash
 oc get services
@@ -82,15 +82,15 @@ NAME                  TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          
 example-spring-boot   ClusterIP   172.30.141.7   <none>        8080/TCP,8778/TCP,9779/TCP   3m
 ```
 
-Wie Sie am Output sehen, ist unser Service `example-spring-boot` über eine IP-Adresse und mehrere Ports erreichbar (z.B. 172.30.141.7:8080).
+As you can see from the output, our service `example-spring-boot` is accessible via an IP address and several ports (e.g. 172.30.141.7:8080).
 
 __Note__:
-Ihre IP-Adresse wird mit grosser Wahrscheinlichkeit von der hier gezeigten abweichen.
-Diese IP-Adresse ist ausserdem OpenShift-intern und kann von ausserhalb nicht erreicht werden.
+Your IP address will most likely be different from the one shown here.
+This IP address is also internal to OpenShift and cannot be reached from outside.
 
-__Note__: Service IPs bleiben während ihrer Lebensdauer immer gleich.
+__Note__: Service IPs always remain the same during their lifetime.
 
-Mit dem folgenden Befehl können Sie zusätzliche Informationen über den Service auslesen:
+You can use the following command to read out additional information about the service:
 
 ```bash
 oc get service example-spring-boot -o json
@@ -152,20 +152,20 @@ oc get service example-spring-boot -o json
 }
 ```
 
-__Tipp__:
-Der `-o` Parameter akzeptiert auch `yaml` als Angabe.
+__Hint__:
+The `-o` parameter also accepts `yaml` as a specification.
 
-Mit dem folgenden Befehl können Sie auch die Details zu einem Pod anzeigen:
+You can also use the following command to view the details of a pod:
 
 ```bash
 oc get pod example-spring-boot-3-nwzku -o json
 ```
 
 __Note__:
-Fragen Sie zuerst den Pod Namen aus Ihrem Projekt mit `oc get pods` ab und ersetzen ihn dann im obigen Befehl.
+First query the pod name from your project with `oc get pods` and then replace it in the above command.
 
-Über den `selector` im Service wird definiert, welche Pods (`labels`) als Endpoints dienen.
-Dazu können die entsprechenden Konfigurationen von Service und Pod zusammen betrachtet werden.
+The `selector` in the service is used to define which pods (`labels`) serve as endpoints.
+For this purpose, the corresponding configurations of service and pod can be viewed together.
 
 Service (`oc get service <Service Name>`):
 
@@ -191,7 +191,7 @@ Pod (`oc get pod <Pod Name>`):
 ...
 ```
 
-Diese Verknüpfung ist besser mittels `oc describe` Befehl zu sehen:
+This link is better seen using `oc describe` command:
 
 ```bash
 $ oc describe service example-spring-boot
@@ -218,17 +218,17 @@ Session Affinity:  None
 Events:            <none>
 ```
 
-Unter Endpoints finden Sie nun den aktuell laufenden Pod.
+Under Endpoints you will now find the currently running pod.
 
 
 ### ImageStream
 
-[ImageStreams](https://docs.openshift.com/container-platform/latest/openshift_images/image-streams-manage.html) werden dafür verwendet, automatische Tasks auszuführen wie bspw. ein Deployment zu aktualisieren, wenn eine neue Version des Image verfügbar ist.
+[ImageStreams](https://docs.openshift.com/container-platform/latest/openshift_images/image-streams-manage.html) are used to perform automatic tasks such as updating a deployment when a new version of the image is available.
 
-Builds und Deployments können ImageStreams beobachten und auf Änderungen reagieren.
-In unserem Beispiel wird der Image Stream dafür verwendet, ein Deployment zu triggern, sobald etwas am Image geändert hat.
+Builds and deployments can monitor ImageStreams and react to changes.
+In our example, the image stream is used to trigger a deployment when something has changed in the image.
 
-Mit dem folgenden Befehl können Sie zusätzliche Informationen über den ImageStream auslesen:
+You can use the following command to read additional information about the ImageStream:
 
 ```bash
 oc get imagestream example-spring-boot -o json
@@ -237,37 +237,37 @@ oc get imagestream example-spring-boot -o json
 
 ### DeploymentConfig
 
-In der [DeploymentConfig](https://docs.openshift.com/container-platform/latest/applications/deployments/what-deployments-are.html) werden folgende Punkte definiert:
+The following parameters are defined in the [DeploymentConfig](https://docs.openshift.com/container-platform/latest/applications/deployments/what-deployments-are.html):
 
-- Update Strategy: Wie werden Applikationsupdates ausgeführt, wie erfolgt das Austauschen der Container?
-- Triggers: Welche Ereignisse führen zu einem automatischen Deployment?
+- Update Strategy: How are application updates executed, how is the replacement of containers performed?
+- Triggers: Which events lead to an automatic deployment?
 - Container:
-  - Welches Image soll verwendet werden?
+  - Which image should be used?
   - Environment Configuration
   - ImagePullPolicy
-- Replicas: Anzahl der Pods, die deployt werden sollen
+- Replicas: Number of pods to be deployed
 
-Mit dem folgenden Befehl können zusätzliche Informationen zur DeploymentConfig ausgelesen werden:
+The following command can be used to read out additional information about the DeploymentConfig:
 
 ```bash
 oc get deploymentConfig example-spring-boot -o json
 ```
 
-Im Gegensatz zur DeploymentConfig, mit welcher man OpenShift sagt, wie eine Applikation deployt werden soll, definiert man mit dem ReplicationController, wie die Applikation während der Laufzeit aussehen soll (bspw. dass immer 3 Replicas laufen sollen).
+Unlike the DeploymentConfig, which tells OpenShift how to deploy an application, the ReplicationController defines how the application should look like during runtime (e.g. that 3 replicas should always be running).
 
-__Tipp__:
-Für viele der Resource Types gibt es auch eine Kurzform. So können Sie bspw. anstelle von `oc get deploymentconfig` auch einfach `oc get dc` schreiben, oder `svc` anstelle von `service`.
+__Hint__:
+For many of the resource types there is also a short form. For example, instead of `oc get deploymentconfig` you can simply write `oc get dc`, or `svc` instead of `service`.
 
 ---
 
-## Zusatzaufgabe für Schnelle ;-)
+## Additional task for the fast ones ;-)
 
-Schauen Sie sich die erstellten Ressourcen mit `oc get [ResourceType] [Name] -o json` und `oc describe [ResourceType] [Name]` aus dem ersten Projekt `[USERNAME]-example1` an. Alternativ kann das Projekt `openshift-web-console` verwendet werden.
+Look at the created resources with `oc get [ResourceType] [Name] -o json` and `oc describe [ResourceType] [Name]` from the first project `[USERNAME]-example1`. Alternatively, the `openshift-web-console` project can be used.
 
 ---
 
 __Ende Lab 4__
 
-<p width="100px" align="right"><a href="05_create_route.md">Routen erstellen →</a></p>
+<p width="100px" align="right"><a href="05_create_route.md">Create routes →</a></p>
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)

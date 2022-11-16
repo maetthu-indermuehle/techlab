@@ -1,101 +1,101 @@
-# Lab 1: Quicktour durch OpenShift
+# Lab 1: Quicktour through OpenShift
 
-In diesem Lab werden die Grundkonzepte von OpenShift vorgestellt. Des Weiteren zeigen wir auf, wie man sich in der Web Console einloggt und stellen die einzelnen Bereiche kurz vor.
+In this lab, we will introduce the basic concepts of OpenShift. Furthermore, we will show how to log into the Web Console and briefly introduce the individual areas.
 
-Die hier aufgeführten Begriffe und Ressourcen sind ein Auszug [dieses Red Hat Blogposts](https://developers.redhat.com/blog/2018/02/22/container-terminology-practical-introduction/), dem auch weiterführende Informationen zu Begriffen rund um Container entnommen werden können.
+The terms and resources listed here are an excerpt [from this Red Hat blog post](https://developers.redhat.com/blog/2018/02/22/container-terminology-practical-introduction/), which also provides further information on container-related terms.
 
 
-## Grundkonzepte
+## Basic concepts
 
-OpenShift basiert auf modernen Konzepten wie CRI-O oder Kubernetes und bietet damit eine Plattform, mit der Software in Containern gebaut, deployt und betrieben werden kann.
+OpenShift is based on modern concepts such as CRI-O or Kubernetes and thus offers a platform with which software can be built, deployed and operated in containers.
 
 
 ### Container Engine
 
-[cri-o](https://cri-o.io/) ist eine leichtgewichtige Container Engine, welche Container Images in einen laufenden Prozess umwandelt, also in einen Container. Dies geschieht anhand der [Container Runtime Specification](https://github.com/opencontainers/runtime-spec) der [Open Container Initiative](https://www.opencontainers.org/), welche auch die [Image Specification](https://github.com/opencontainers/image-spec) festgelegt hat. Sämtliche OCI-konformen Images können so mit OCI-konformen Engines ausgeführt werden.
+[cri-o](https://cri-o.io/) is a lightweight container engine that converts container images into a running process, i.e. a container. This is done using the [Container Runtime Specification](https://github.com/opencontainers/runtime-spec) of the [Open Container Initiative](https://www.opencontainers.org/), which has also defined the [Image Specification](https://github.com/opencontainers/image-spec). All OCI-compliant images can thus be executed with OCI-compliant engines.
 
 
 ### Kubernetes
 
-[Kubernetes](http://kubernetes.io/) ist ein Container Orchestration Tool, welches das Verwalten von Containern wesentlich vereinfacht. Der Orchestrator terminiert dynamisch den Container Workload innerhalb eines Clusters.
+[Kubernetes](http://kubernetes.io/) is a container orchestration tool that makes managing containers much easier. The orchestrator dynamically schedules the container workload within a cluster.
 
 
-### Container und Container Images
+### Container and Container Images
 
-Die Basiselemente von OpenShift Applikationen sind Container. Ein Container ist ein isolierter Prozess auf einem Linuxsystem mit eingeschränkten Ressourcen, der nur mit definierten Prozessen interagieren kann.
+The basic elements of OpenShift applications are containers. A container is an isolated process on a Linux system with limited resources that can only interact with defined processes.
 
-Container basieren auf Container Images. Ein Container wird gestartet, indem die Container Engine die Dateien und Metadaten des Container Images entpackt und dem Linux Kernel übergibt.
+Containers are based on container images. A container is started by the container engine unpacking the files and metadata of the container image and passing them to the Linux kernel.
 
-Container Images werden bspw. anhand von Dockerfiles (textueller Beschrieb, wie das Container Image Schritt für Schritt aufgebaut ist) gebaut. Grundsätzlich sind Container Images hierarchisch angewendete Filesystem Snapshots.
+Container images are built, for example, using Dockerfiles (textual description of how the container image is built step by step). Basically, container images are hierarchically applied filesystem snapshots.
 
-Beispiel Tomcat:
+Example of Tomcat:
 
 - Base Image (z.B. [UBI](https://www.redhat.com/en/blog/introducing-red-hat-universal-base-image))
 - \+ Java
 - \+ Tomcat
 - \+ App
 
-Gebaute Container Images werden in einer Image Registry (analog einem Repository für bspw. RPM-Pakete) versioniert abgelegt und können von da bezogen werden, um sie auf einer Container Plattform zu deployen.
-Container Images können auch auf OpenShift selbst gebaut werden, von wo aus sie in die OpenShift-interne Registry gepusht und für das Deployment wieder gepullt werden.
+Built container images are versioned in an image registry (analogous to a repository for e.g. RPM packages) and can be obtained from there to deploy them on a container platform.
+Container images can also be built on OpenShift itself, from where they are pushed to the OpenShift internal registry and pulled again for deployment.
 
 
 ## OpenShift-Konzepte
-### Projekte
+### Projects
 
-In OpenShift werden Ressourcen (Container und Container Images, Pods, Services, Routen, Konfiguration, Quotas und Limiten etc.) in Projekten strukturiert. Aus technischer Sicht entspricht ein Projekt einem Kubernetes Namespace und erweitert diesen um gewisse Konzepte.
+In OpenShift, resources (containers and container images, pods, services, routes, configuration, quotas and limits, etc.) are structured in projects. From a technical perspective, a project corresponds to a Kubernetes namespace and extends it with certain concepts.
 
-Innerhalb eines Projekts können berechtigte User ihre Ressourcen selber verwalten und organisieren.
+Within a project, authorized users can manage and organize their resources themselves.
 
-Die Ressourcen innerhalb eines Projektes sind über ein transparentes [SDN](https://de.wikipedia.org/wiki/Software-defined_networking) bzw. Overlay-Netzwerk verbunden. So können die einzelnen Komponenten eines Projektes in einem Multi-Node Setup auf verschiedene Nodes deployed werden. Dabei sind sie über das SDN untereinander sicht- und zugreifbar.
+The resources within a project are connected via a transparent [SDN](https://de.wikipedia.org/wiki/Software-defined_networking) or overlay network. Thus, the individual components of a project can be deployed to different nodes in a multi-node setup. They are visible and accessible to each other via the SDN.
 
 
 ### Pods
 
-OpenShift übernimmt das Konzept der Pods von Kubernetes.
+OpenShift adopts the concept of pods from Kubernetes.
 
-Ein Pod ist ein oder mehrere Container, die zusammen auf den gleichen Host deployed werden. Ein Pod ist die kleinste verwaltbare Einheit in OpenShift.
+A pod is one or more containers deployed together on the same host. A pod is the smallest manageable unit in OpenShift.
 
-Ein Pod ist innerhalb eines OpenShift Projekts u.a. über den entsprechenden Service verfügbar.
+A pod is available within an OpenShift project via the corresponding service, among others.
 
 
 ### Services
 
-Ein Service repräsentiert einen internen Loadbalancer auf die dahinterliegenden Pods (Replicas vom gleichen Typ). Der Service dient als Proxy zu den Pods und leitet Anfragen an diese weiter. So können Pods willkürlich einem Service hinzugefügt und entfernt werden, während der Service verfügbar bleibt.
+A service represents an internal load balancer to the pods behind it (replicas of the same type). The service serves as a proxy to the pods and forwards requests to them. Thus, pods can be added and removed from a service arbitrarily while the service remains available.
 
-Einem Service ist innerhalb eines Projektes eine IP und ein Port zugewiesen.
+A service is assigned an IP and a port within a project.
 
 
 ### Routes
 
-Mit einer Route definiert man in OpenShift, wie ein Service von ausserhalb von OpenShift von externen Clients erreicht werden kann.
+With a route, one defines in OpenShift how a service can be reached from outside OpenShift by external clients.
 
-Diese Routes werden im integrierten Routing Layer eingetragen und erlauben dann der Plattform über ein Hostname-Mapping die Requests an den entsprechenden Service weiterzuleiten.
+These routes are entered in the integrated routing layer and then allow the platform to forward the requests to the corresponding service via a hostname mapping.
 
-Sind mehr als ein Pod für einen Service deployt, verteilt der Routing Layer die Requests auf die deployten Pods.
+If more than one pod is deployed for a service, the routing layer distributes the requests to the deployed pods.
 
-Aktuell werden folgende Protokolle unterstützt:
+The following protocols are currently supported:
 
 - HTTP
 - HTTPS ([SNI](https://en.wikipedia.org/wiki/Server_Name_Indication))
 - WebSockets
-- TLS-verschlüsselte Protokolle mit [SNI](https://en.wikipedia.org/wiki/Server_Name_Indication)
+- TLS-encrypted protocols with [SNI](https://en.wikipedia.org/wiki/Server_Name_Indication)
 
 
 ### Templates
 
-Ein Template beschreibt textuell eine Liste von Ressourcen, die auf OpenShift ausgeführt und entsprechend in OpenShift erstellt werden können.
+A template textually describes a list of resources that can be run on OpenShift and created in OpenShift accordingly.
 
-So hat man die Möglichkeit ganze Infrastrukturen zu beschreiben:
+This gives the possibility to describe whole infrastructures:
 
-- Java Application Service (3 Replicas, Rolling Upgrade)
-- Datenbank Service
-- Im Internet über Route java.app.appuio-beta.ch erreichbar
+- Java Application Service (3 replicas, rolling upgrade)
+- Database Service
+- Available on the Internet via route java.app.appuio-beta.ch
 - ...
 
 ---
 
 __Ende Lab 1__
 
-<p width="100px" align="right"><a href="02_cli.md">OpenShift CLI installieren →</a></p>
+<p width="100px" align="right"><a href="02_cli.md">OpenShift CLI installation →</a></p>
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)

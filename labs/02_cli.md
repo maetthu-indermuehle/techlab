@@ -1,17 +1,17 @@
-# Lab 2: OpenShift CLI installieren
+# Lab 2: OpenShift CLI installation 
 
-In diesem Lab werden wir gemeinsam das CLI-Tool `odo` installieren und konfigurieren, damit wir danach die ersten Schritte auf der OpenShift Techlab Plattform durchführen können.
+In this lab, we will work together to install and configure the `odo` CLI tool so that we can then take our first steps on the OpenShift Techlab platform.
 
 ## `oc`
 
-Der __oc client__ stellt ein Interface zu OpenShift bereit.
+The __oc client__ provides an interface to OpenShift.
 
 ### Installation
 
-Gemäss [offizieller Dokumentation](https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html#cli-installing-cli_cli-developer-commands) kann der __oc client__ von der __Infrastructure Provider__ Seite heruntergeladen werden, oder einfacher gleich direkt von folgender URL: <https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/>
+According to the [official documentation](https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html#cli-installing-cli_cli-developer-commands) the __oc client__ can be downloaded from the __Infrastructure Provider__ , or simpler from the following URL: <https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/>
 
-__Tipp__:
-Alternativ kann die Binary auch mittels folgenden Befehlen im Terminal installiert werden:
+__Hint__:
+Alternatively, the binary can be installed using the following commands in the terminal on linux:
 
 ```bash
 curl -fsSL https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz | sudo tar xfz - -C /usr/bin
@@ -19,12 +19,12 @@ curl -fsSL https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux
 
 ### bash Command Completion (optional)
 
-Dieser Schritt ist optional und funktioniert nicht auf Windows. Damit Command Completion auf macOS funktioniert, muss bspw. via `brew` das Paket `bash-completion` installiert werden.
+This step is optional and does not work on Windows. For Command Completion to work on macOS, the `bash-completion` package must be installed via `brew`, for example.
 
-`oc` bietet eine Command Completion, die gem. [Dokumention](https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/configuring-cli.html#cli-enabling-tab-completion_cli-configuring-cli) eingerichtet werden kann.
+`oc` offers a Command Completion, which can be installed according to the [documentation](https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/configuring-cli.html#cli-enabling-tab-completion_cli-configuring-cli).
 
-__Tipp__:
-Alternativ kann die Bash Command Completion auch mittels folgenden Befehlen im Terminal installiert werden:
+__Hint__:
+Alternatively, the Bash Command Completion can be installed using the following commands in the terminal:
 
 ```bash
 oc completion bash | sudo tee /etc/bash_completion.d/oc_bash_completion
@@ -32,6 +32,6 @@ oc completion bash | sudo tee /etc/bash_completion.d/oc_bash_completion
 
 __Ende Lab 2__
 
-<p width="100px" align="right"><a href="03_first_steps.md">Erste Schritte auf der Lab Plattform →</a></p>
+<p width="100px" align="right"><a href="03_first_steps.md">First Steps on the platform →</a></p>
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)
