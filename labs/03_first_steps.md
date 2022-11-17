@@ -62,7 +62,7 @@ The OpenShift Web Console allows users to perform certain tasks directly via the
 
    1. Make sure that your newly created project is selected under "Project".
 
-   1. Click the _Add+_ button on the top of the left menu stack.
+   1. Click the "+Add" button on the top of the left menu stack.
 
    1. Now select "All services" under "Developer Catalog" in the bottom left-hand corner.
 
