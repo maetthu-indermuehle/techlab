@@ -32,7 +32,7 @@ __Goals of this Techlab__:
 - [Cron Jobs in OpenShift](additional-labs/cronjobs_and_jobs.md)
 - [ConfigMaps](additional-labs/configmaps.md)
 - [Jenkins](additional-labs/jenkins.md)
-- [Your OpenShift Development enviromnet](additional-labs/development_environment.md)
+- [Your OpenShift Development Environment](additional-labs/development_environment.md)
 
 ### OpenShift Developer Techlab
 
@@ -45,6 +45,6 @@ Documentation for a two-day Developer Techlab is stored in the [dev-labs](dev-la
 
 ### APPUiO Examples
 
-- [APPUiO PHP Source to image hello World Example](https://github.com/appuio/example-php-sti-helloworld)
-- [APPUiO PHP Dockerbuild hello World Example](https://github.com/appuio/example-php-docker-helloworld)
+- [APPUiO PHP Source to image Hello World Example](https://github.com/appuio/example-php-sti-helloworld)
+- [APPUiO PHP Dockerbuild Hello World Example](https://github.com/appuio/example-php-docker-helloworld)
 - [APPUiO Cron Job Example](https://github.com/appuio/example-cron-traditional)

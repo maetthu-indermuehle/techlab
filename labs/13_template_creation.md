@@ -1,23 +1,23 @@
-# Lab 13: Eigene Templates erstellen
+# Lab 13: Create your own templates
 
-Im Unterschied zu [Lab 12](12_template.md) schreiben wir hier unsere eigenen Templates bevor wir damit Applikationen erstellen.
+Unlike [Lab 12](12_template.md), here we write our own templates before creating applications with them.
 
 
-## Hilfreiche `oc`-Befehle
+## Helpful `oc` commands
 
-Auflisten aller Befehle:
+List all commands:
 
 ```bash
 oc help
 ```
 
-Übersicht (fast) aller Ressourcen:
+Overview of (almost) all resources:
 
 ```bash
 oc get all
 ```
 
-Infos zu einer Ressource:
+Info about a resource:
 
 ```bash
 oc get <RESOURCE_TYPE> <RESOURCE_NAME>
@@ -25,55 +25,55 @@ oc describe <RESOURCE_TYPE> <RESOURCE_NAME>
 ```
 
 
-## Generierung
+## Generation
 
-Über `oc new-app` oder "\+Add" in der Web Console werden die Ressourcen automatisch angelegt.
-In der Web Console kann die Erstellung einfach konfiguriert werden.
+Via `oc new-app` or "\+Add" in the Web Console the resources are created automatically.
+The creation can be easily configured in the Web Console.
 
-Für den produktiven Einsatz reicht das meistens nicht aus.
-Da braucht es mehr Kontrolle über die Konfiguration.
-Eigene Templates sind hierfür die Lösung.
-Sie müssen jedoch nicht von Hand geschrieben sondern können als Vorlage generiert werden.
+For productive use, this is usually not enough.
+More control over the configuration is needed.
+Custom templates are the solution for this.
+However, they do not have to be written by hand but can be generated as a template.
 
 
-### Generierung vor Erstellung
+### Generation before creation
 
-Mit `oc new-app` parst OpenShift die gegebenen Images, Templates, Source Code Repositories usw. und erstellt die Definition der verschiedenen Ressourcen.
-Mit der Option `-o` erhält man die Definition, ohne dass die Ressourcen angelegt werden.
+With `oc new-app` OpenShift parses the given images, templates, source code repositories, etc. and creates the definition of the various resources.
+With the `-o` option you get the definition without creating the resources.
 
-So sieht die Definition vom hello-world Image aus:
+This is how the definition of the hello-world image looks like:
 
 ```bash
 oc new-app hello-world -o json
 ```
 
-Spannend ist auch zu beobachten, was OpenShift aus einem eigenen Projekt macht.
-Hierfür kann ein Git Repository oder ein lokaler Pfad des Rechners angeben werden.
+It is also exciting to observe what OpenShift makes of an own project.
+For this, a Git repository or a local path of the computer can be specified.
 
-Beispiel-Befehl, wenn man sich im Root-Verzeichnis des Projekts befindet:
+Example command if one is in the root directory of the project:
 
 ```bash
 oc new-app . -o json
 ```
 
-Wenn verschiedene ImageStreams in Frage kommen oder keiner gefunden wurde, muss er spezifiziert werden:
+If different ImageStreams are in question or none was found, it must be specified:
 
 ```bash
 oc new-app . --image-stream=wildfly:latest -o json
 ```
 
-`oc new-app` erstellt immer eine Liste von Ressourcen.
-Bei Bedarf kann eine solche mit [jq](https://stedolan.github.io/jq/) in ein Template konvertiert werden:
+`oc new-app` always creates a list of resources.
+If needed, one can be converted to a template with [jq](https://stedolan.github.io/jq/):
 
 ```bash
 oc new-app . --image-stream=wildfly:latest -o json | \
-  jq '{ kind: "Template", apiVersion: .apiVersion, metadata: {name: "mytemplate" }, objects: .items }'
+  jq `{ kind: "Template", apiVersion: .apiVersion, metadata: {name: "mytemplate" }, objects: .items }`
 ```
 
 
-### Generierung nach Erstellung
+### Generation after creation
 
-Bestehende Ressourcen werden mit `oc get -o json` bzw `oc get -o yaml` exportiert.
+Existing resources are exported with `oc get -o json` or `oc get -o yaml`.
 
 ```bash
 oc get route my-route -o json
@@ -81,7 +81,7 @@ oc get route my-route -o json
 
 Welche Ressourcen braucht es?
 
-Für ein vollständiges Template sind folgende Ressourcen notwendig:
+The following resources are necessary for a complete template:
 
 - ImageStreams
 - BuildConfigurations
@@ -90,27 +90,27 @@ Für ein vollständiges Template sind folgende Ressourcen notwendig:
 - Routes
 - Services
 
-Beispiel-Befehl um einen Export der wichtigsten Ressourcen als Template zu generieren:
+Example command to generate an export of the most important resources as a template:
 
 ```bash
 oc get is,bc,pvc,dc,route,service -o json > my-template.json
 ```
 
-Attribute mit Wert `null` sowie die Annotation `openshift.io/generated-by` dürfen aus dem Template entfernt werden.
+Attributes with value `null` as well as the annotation `openshift.io/generated-by` may be removed from the template.
 
 
-### Vorhandene Templates exportieren
+### Export existing templates
 
-Es können auch bestehende Templates der Plattform abgeholt werden um eigene Templates zu erstellen.
+It is also possible to pick up existing templates from the platform to create your own templates.
 
-Verfügbare Templates sind im Projekt `openshift` hinterlegt.
-Diese können wie folgt aufgelistet werden:
+Available templates are stored in the project `openshift`.
+These can be listed as follows:
 
 ```bash
 oc get templates -n openshift
 ```
 
-So erhalten wir eine Kopie vom eap70-mysql-persistent-s2i Template:
+So we get a copy of the eap70-mysql-persistent-s2i template:
 
 ```bash
 oc get template eap72-mysql-persistent-s2i -o json -n openshift > eap72-mysql-persistent-s2i.json
@@ -119,13 +119,13 @@ oc get template eap72-mysql-persistent-s2i -o json -n openshift > eap72-mysql-pe
 
 ## Parameter
 
-Damit die Applikationen für die eigenen Bedürfnisse angepasst werden können, gibt es Parameter.
-Generierte oder exportierte Templates sollten fixe Werte wie Hostnamen oder Passwörter durch Parameter ersetzen.
+There are parameters so that the applications can be customized for one`s own needs.
+Generated or exported templates should replace fixed values like hostnames or passwords with parameters.
 
 
-### Parameter von Templates anzeigen
+### Display template parameters
 
-Mit `oc process --parameters` werden die Parameter eines Templates angezeigt. Hier wollen wir sehen, welche Paramter im CakePHP MySQL Template definiert sind:
+With `oc process --parameters` the parameters of a template are displayed. Here we want to see which parameters are defined in the CakePHP MySQL template:
 
 ```bash
 oc process --parameters cakephp-mysql-example -n openshift
@@ -138,23 +138,23 @@ MEMORY_MYSQL_LIMIT             Maximum amount of memory the MySQL container can 
 ```
 
 
-### Parameter von Templates mit Werten ersetzen
+### Replace parameters of templates with values
 
-Für die Erzeugung der Applikationen können gewünschte Parameter mit Werten ersetzt werden.
-Dazu verwenden wir `oc process`:
+For the creation of the applications, desired parameters can be replaced with values.
+For this purpose we use `oc process`:
 
 ```bash
 oc process -f eap70-mysql-persistent-s2i.json \
   -v PARAM1=value1,PARAM2=value2 > processed-template.json
 ```
 
-So werden Parameter vom Template mit den gegebenen Werten ersetzt und in eine neue Datei geschrieben. Diese Datei wird eine Liste von Resources/Items sein, welche mit `oc create` erstellt werden können:
+So parameters from the template will be replaced with the given values and written to a new file. This file will be a list of resources/items which can be created with `oc create`:
 
 ```bash
 oc create -f processed-template.json
 ```
 
-Dies kann auch in einem Schritt erledigt werden:
+This can also be done in one step:
 
 ```bash
 oc process -f eap72-mysql-persistent-s2i.json \
@@ -163,21 +163,21 @@ oc process -f eap72-mysql-persistent-s2i.json \
 ```
 
 
-## Templates schreiben
+## Write templates
 
-OpenShift Dokumentation: <https://docs.openshift.com/container-platform/latest/openshift_images/using-templates.html>
+OpenShift Documentation: <https://docs.openshift.com/container-platform/latest/openshift_images/using-templates.html>
 
-Applikationen sollten so gebaut werden, dass sich pro Umgebung nur ein paar Konfigurationen unterscheiden.
-Diese Werte werden im Template als Parameter definiert.
-Somit ist der erste Schritt nach dem Generieren einer Template-Definition das Definieren von Parametern.
-Das Template wird mit Variablen erweitert, welche dann mit den Parameterwerten ersetzt werden.
-So wird bspw. die Variable `${DB_PASSWORD}` durch den Parameter mit Namen `DB_PASSWORD` ersetzt.
+Applications should be built so that only a few configurations differ per environment.
+These values are defined as parameters in the template.
+Thus, the first step after generating a template definition is to define parameters.
+The template is extended with variables, which are then replaced with the parameter values.
+For example, the variable `${DB_PASSWORD}` is replaced with the parameter named `DB_PASSWORD`.
 
 
 ### Generierte Parameter
 
-Oft werden Passwörter automatisch generiert, da der Wert nur im OpenShift Projekt verwendet wird.
-Dies kann mit einer "generate"-Definition erreicht werden.
+Often passwords are generated automatically because the value is only used in the OpenShift project.
+This can be achieved with a "generate" definition.
 
 ```
 parameters:
@@ -187,26 +187,26 @@ parameters:
     from: "[a-zA-Z0-9]{13}"
 ```
 
-Diese Definition würde ein zufälliges, 13 Zeichen langes Passwort mit Klein- und Grossbuchstaben sowie Zahlen generieren.
+This definition would generate a random, 13-character password with lowercase and uppercase letters and numbers.
 
-Auch wenn ein Parameter mit "generate"-Definition konfiguriert ist, kann er bei der Erzeugung überschrieben werden.
+Even if a parameter is configured with "generate" definition, it can be overwritten during generation.
 
 
 ### Template Merge
 
-Wenn z.B eine App mit einer Datenbank zusammen verwendet wird, können die zwei Templates zusammengelegt werden.
-Dabei ist es wichtig, die Template Parameter zu konsolidieren.
-Dies sind meistens Werte für die Anbindung der Datenbank.
-Dabei einfach in beiden Templates die gleiche Variable vom gemeinsamen Parameter verwenden.
+For example, if an app is used together with a database, the two templates can be merged.
+It is important to consolidate the template parameters.
+These are usually values for the connection of the database.
+Simply use the same variable from the common parameter in both templates.
 
 
 ## Anwenden vom Templates
 
-Templates können mit `oc new-app -f <FILE>|<URL> -p <PARAM1>=<VALUE1>,<PARAM2>=<VALUE2>...` instanziert werden.
-Wenn die Parameter des Templates bereits mit `oc process` gesetzt wurden, braucht es die Angabe der Parameter nicht mehr.
+Templates can be instantiated with `oc new-app -f <FILE>|<URL> -p <PARAM1>=<VALUE1>,<PARAM2>=<VALUE2>...`.
+If the parameters of the template have already been set with `oc process`, there is no need to specify the parameters.
 
 ---
 
 __Ende Lab 13__
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)

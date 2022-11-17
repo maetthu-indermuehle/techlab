@@ -1,35 +1,35 @@
-# Lab 10: Persistent Storage anbinden und verwenden für Datenbank
+# Lab 10: Connect and use persistent storage for database
 
-Per se sind Daten in einem Pod nicht persistent, was u.a. auch in unserem Beispiel der Fall ist.
-Verschwindet also unser MariaDB-Pod bspw. aufgrund einer Änderung des Image, sind die bis zuvor noch vorhandenen Daten im neuen Pod nicht mehr vorhanden.
-Um genau dies zu verhindern hängen wir nun Persistent Storage an unseren MariaDB-Pod an.
+Per se, data in a pod is not persistent, which is also the case in our example.
+If our MariaDB pod disappears, e.g. due to a change in the image, the data that existed before is no longer available in the new pod.
+To prevent this, we now attach Persistent Storage to our MariaDB pod.
 
-## Aufgabe 1: Persistent Storage anbinden
+## Task 1: Persistent Storage anbinden
 
-### Storage anfordern
+### Request Storage
 
-Das Anhängen von Persistent Storage geschieht eigentlich in zwei Schritten.
-Der erste Schritt beinhaltet als erstes das Erstellen eines sog. PersistentVolumeClaim für unser Projekt.
-Im Claim definieren wir u.a. dessen Namen sowie Grösse, also wie viel persistenten Speicher wir überhaupt haben wollen.
+Attaching persistent storage is actually done in two steps.
+The first step involves creating a PersistentVolumeClaim for our project.
+In the claim we define, among other things, its name and size, i.e. how much persistent storage we want to have in the first place.
 
-Der PersistentVolumeClaim stellt allerdings erst den Request dar, nicht aber die Ressource selbst.
-Er wird deshalb automatisch durch OpenShift mit einem zur Verfügung stehenden Persistent Volume verbunden, und zwar mit einem mit mindestens der angeforderten Grösse.
-Sind nur noch grössere Persistent Volumes vorhanden, wird eines dieser Volumes verwendet und die Grösse des Claim angepasst.
-Sind nur noch kleinere Persistent Volumes vorhanden, kann der Claim nicht erfüllt werden und bleibt solange offen, bis ein Volume der passenden Grösse (oder eben grösser) auftaucht.
+The PersistentVolumeClaim represents the request, but not the resource itself.
+It is therefore automatically associated by OpenShift with an available persistent volume, namely one with at least the requested size.
+If only larger Persistent Volumes are available, one of these volumes is used and the size of the Claim is adjusted.
+If only smaller persistent volumes are available, the claim cannot be fulfilled and remains open until a volume of the appropriate size (or even larger) appears.
 
 
-### Volume in Pod einbinden
+### Include volume in Pod
 
-Im zweiten Schritt wird der zuvor erstellte PVC im richtigen Pod eingebunden.
-In [Lab 6](06_scale.md) bearbeiteten wir die DeploymentConfig, um die Readiness Probe einzufügen.
-Dasselbe tun wir nun für das Persistent Volume.
-Im Unterschied zu [Lab 6](06_scale.md) können wir aber mit `oc set volume` die DeploymentConfig automatisch erweitern.
+The second step is to include the previously created PVC in the correct pod.
+In [Lab 6](06_scale.md), we edited the DeploymentConfig to include the Readiness Probe.
+We now do the same for the Persistent Volume.
+However, unlike [Lab 6](06_scale.md), we can use `oc set volume` to automatically extend the DeploymentConfig.
 
-Wir verwenden dafür das Projekt aus [Lab 9](09_database.md) [USERNAME]-dockerimage.
+We use the project from [Lab 9](09_database.md) [USERNAME]-dockerimage for this.
 
-<details><summary><b>Tipp</b></summary>oc project [USERNAME]-dockerimage</details><br/>
+<details><summary><b>Hint</b></summary>oc project [USERNAME]-dockerimage</details><br/>
 
-Der folgende Befehl führt beide beschriebenen Schritte zugleich aus, er erstellt also zuerst den Claim und bindet ihn anschliessend auch als Volume im Pod ein:
+The following command performs both of the described steps at the same time, so it first creates the claim and then also includes it as a volume in the pod:
 
 ```bash
 oc set volume dc/mariadb --add --name=mariadb-data --type pvc \
@@ -37,19 +37,19 @@ oc set volume dc/mariadb --add --name=mariadb-data --type pvc \
 ```
 
 __Note__:
-Durch die veränderte DeploymentConfig deployt OpenShift automatisch einen neuen Pod.
-D.h. leider auch, dass das vorher erstellte DB-Schema und bereits eingefügte Daten verloren gegangen sind.
+Due to the changed DeploymentConfig, OpenShift automatically deploys a new Pod.
+Unfortunately, this also means that the previously created DB schema and already inserted data have been lost.
 
-Unsere Applikation erstellt beim Starten das DB Schema eigenständig.
+Our application creates the DB schema on its own at startup.
 
-__Tipp__:
-Redeployen Sie den Applikations-Pod mit:
+__Hint__:
+Redeploy the application pod with:
 
 ```bash
 oc rollout latest example-spring-boot
 ```
 
-Mit dem Befehl `oc get persistentvolumeclaim`, oder etwas einfacher `oc get pvc`, können wir uns nun den im Projekt frisch erstellten PersistentVolumeClaim anzeigen lassen:
+With the command `oc get persistentvolumeclaim`, or somewhat simpler `oc get pvc`, we can now display the PersistentVolumeClaim freshly created in the project:
 
 ```
 oc get pvc
@@ -57,9 +57,9 @@ NAME         STATUS    VOLUME    CAPACITY   ACCESSMODES   AGE
 mariadbpvc   Bound     pv34      1Gi        RWO,RWX       14s
 ```
 
-Die beiden Attribute Status und Volume zeigen uns an, dass unser Claim mit dem Persistent Volume pv34 verbunden wurde.
+The two attributes Status and Volume tell us that our claim has been associated with the Persistent Volume pv34.
 
-Mit dem folgenden Befehl können wir auch noch überprüfen, ob das Einbinden des Volume in die DeploymentConfig geklappt hat:
+With the following command we can also check whether the mounting of the volume in the DeploymentConfig worked:
 
 ```bash
 oc set volume dc/mariadb --all
@@ -69,21 +69,22 @@ deploymentconfigs/mariadb
 ```
 
 
-## Aufgabe 2: Persistenz-Test
+## Task 2: Persistence test
 
-### Daten wiederherstellen
+### Restore data
 
-Wiederholen Sie [Lab-Aufgabe 9.4](09_database.md#l%C3%B6sung-lab84).
+Repeat[Lab-Task 9.4](09_database.md#l%C3%B6sung-lab84).
 
 
 ### Test
 
-Skalieren Sie nun den MariaDB-Pod auf 0 und anschliessend wieder auf 1. Beobachten Sie, dass der neue Pod die Daten nicht mehr verliert.
+Now scale the MariaDB pod to 0 and then scale it back to 1. Observe that the new pod no longer loses the data.
 
 ---
 
 __Ende Lab 10__
 
-<p width="100px" align="right"><a href="11_dockerbuild_webhook.md">Code Änderungen via Webhook direkt integrieren →</a></p>
+<p width="100px" align="right"><a href="11_dockerbuild_webhook.md">Integrate code changes directly via webhook →</a></p>
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)
+

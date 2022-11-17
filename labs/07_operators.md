@@ -74,11 +74,11 @@ spec:
 EOF
 ```
 
-Mit der Subscription teilen wir dem Operator Lifecycle Manager mit, welchen Operator (`name`) von welchem Katalog (`source` und `sourceNamespace`) wir gerne installieren möchten. Die meisten Operators bieten verschiedene Update Channels (`channel`), wie z.B. alpha, beta oder stable an. OLM installiert dann die neueste Version (ClusterServiceVersion) vom gewählten Channel. Mit der Option `installPlanApproval` kann man zudem einstellen, dass OLM automatisch (`Automatic`) den entsprechenden Operator updated, wenn eine neue Version auf dem Update Channel verfügbar ist.
+With the subscription we tell the operator lifecycle manager which operator (`name`) from which catalog (`source` and `sourceNamespace`) we would like to install. Most operators offer different update channels (`channel`), such as alpha, beta or stable. OLM will then install the latest version (ClusterServiceVersion) of the selected channel. With the option `installPlanApproval` you can also set OLM to automatically (`Automatic`) update the corresponding operator when a new version is available on the update channel.
 
-Im Rest der Task 1 wollen wir nun untersuchen, ob die Installation erfolgreich war und was uns der OLM auf Grund der Subscription alles erstellt hat.
+In the rest of Task 1 we now want to examine whether the installation was successful and what OLM has created for us based on the subscription.
 
-Für die eigntliche Installation sucht OLM die neuste ClusterServiceVersion des `singlenamespace-alpha` Channels und legt diese an:
+For the actual installation OLM searches for the newest ClusterServiceVersion of the `singlenamespace-alpha` channel and creates it:
 
 ```
 $ oc get csv
@@ -86,7 +86,7 @@ NAME                  DISPLAY   VERSION   REPLACES              PHASE
 etcdoperator.v0.9.4   etcd      0.9.4     etcdoperator.v0.9.2   Succeeded
 ```
 
-Die CSV löst die eigentliche Installation des Operators aus und wir sollten das Deployment des Operators im Projekt sehen:
+The CSV triggers the actual installation of the operator and we should see the deployment of the operator in the project:
 
 ```
 $ oc get deployment
@@ -94,7 +94,7 @@ NAME            READY   UP-TO-DATE   AVAILABLE   AGE
 etcd-operator   1/1     1            1           5m
 ```
 
-Weiter finden wir einen Service Account für das Deployment und eine Role inkl. RoleBinding:
+Further we find a Service Account for the deployment and a Role incl. RoleBinding:
 
 ```
 $ oc get serviceaccounts
@@ -116,20 +116,20 @@ etcdoperator.v0.9.4-gdmm2-etcd-operator-7lhcd   5m
 ...
 ```
 
-Im Hintergrund wurden zudem die neuen `CustomResourceDefinition`s angelegt:
+In the background, the new `CustomResourceDefinition`s were also created:
 
 * `etcdclusters.etcd.database.coreos.com` kind: `EtcdCluster`
 * `etcdbackups.etcd.database.coreos.com` kind: `EtcdBackup`
 * `etcdrestores.etcd.database.coreos.com` kind: `EtcdRestore`
 
-Diese ermöglichen es uns in der nächsten Task, die CustomResource `EtcdCluster` anzulegen.
+These allow us in the next task to create the CustomResource `EtcdCluster`.
 
-***Hinweis***: Um CRDs zu sehen, muss man Cluster-Administrator sein. Dann würde man die neuen CRDs wie folgt finden: `oc get crd | grep etcd`
+**Note**: To see CRDs, one must be a cluster administrator. Then you would find the new CRDs as follows: `oc get crd | grep etcd`.
 
 
-### Task 2: ETCD-Cluster erstellen
+### Task 2: Create ETCD cluster
 
-Wir werden nun eine EtcdCluster-Resource anlegen, um einen ETCD-Cluster zu starten:
+We will now create an EtcdCluster resource to start an ETCD cluster:
 
 ```
 oc create -f - <<EOF
@@ -143,7 +143,7 @@ spec:
 EOF
 ```
 
-Nun können wir beobachten, dass drei Pods für den ETCD-Cluster erstellt werden/wurden:
+Now we can observe that three pods are/were created for the ETCD cluster:
 
 ```
 $ oc get pod
@@ -154,17 +154,17 @@ example-745pfjx2zt               1/1     Running   1          6m58s
 example-g7856rl884               1/1     Running   1          8m2s
 ```
 
-Wir können nun einfach den ETCD-Cluster über die EtcdCluster-Resource verändern.
-Wir werden mit `oc edit` die Cluser-Size (.spec.size) auf 5 erhöhen, also den ETCD-Cluster hochskalieren.
+We can now easily modify the ETCD cluster via the EtcdCluster resource.
+We will use `oc edit` to increase the cluser size (.spec.size) to 5, thus scaling up the ETCD cluster.
 
 ```
 oc edit etcdcluster example
 # update .spec.size to 5
 ```
 
-Wir können nun ebenfalls wieder mit `oc get pod` beobachten, dass der EtcdCluster korrekt hochskaliert wird.
-Hierbei startet der ETCD-Operator nicht nur die Pods, sondern er fügt diese auch dem ETCD-Cluster als neue Members hinzu und stellt so sicher, dass die Daten auf die neuen Pods repliziert werden.
-Dies können wir überprüfen, in dem wir uns in einem der ETCD-Pods die Cluster-Members auflisten lassen:
+We can now also observe again with `oc get pod` that the EtcdCluster is scaled up correctly.
+Here, the ETCD operator not only starts the pods, but it also adds them to the ETCD cluster as new members, ensuring that the data is replicated to the new pods.
+We can check this by listing the cluster members in one of the ETCD pods:
 
 ```
 $ oc exec -it example-5fx5jxdh88 -- etcdctl member list
@@ -176,27 +176,27 @@ e514d358ce1b7704: name=example-5fx5jxdh88 peerURLs=http://example-5fx5jxdh88.exa
 ```
 
 
-### Task 3: ETCD-Cluster entfernen
+### Task 3: Remove ETCD cluster
 
-Um den ETCD-Cluster zu entfernen, müssen wir lediglich die EtcdCluster Resource entfernen:
+To remove the ETCD cluster, we just need to remove the EtcdCluster resource:
 
 ```
 oc delete etcdcluster example
 ```
 
 
-### Task 4: Operator deinstallieren
+### Task 4: Uninstall operator
 
-Um einen Operator zu deinstallieren, muss einerseits die Subscription und andererseits die sogenannte ClusterServiceVersion des Operators entfernt werden.
+To uninstall an operator, the subscription on the one hand and the so-called ClusterServiceVersion of the operator on the other hand must be removed.
 
-Mit dem Löschen der Subscription stellen wir sicher, dass keine neue Version mehr installiert wird:
+By deleting the subscription, we ensure that no new version is installed:
 
 ```
 oc delete sub etcd
 ```
 
-Um die eigentlich installierte Version zu entfernen, muss die entsprechende ClusterServiceVersion deinstalliert werden.
-Dazu finden wir zuerst die installierte ClusterServiceVersion:
+To remove the actually installed version, the corresponding ClusterServiceVersion must be uninstalled.
+To do this, we first find the installed ClusterServiceVersion:
 
 ```
 $ oc get csv
@@ -204,19 +204,19 @@ NAME                  DISPLAY   VERSION   REPLACES              PHASE
 etcdoperator.v0.9.4   etcd      0.9.4     etcdoperator.v0.9.2   Succeeded
 ```
 
-Danach entfernen wir die ClusterServiceVersion:
+After that we remove the ClusterServiceVersion:
 
 ```
 oc delete csv etcdoperator.v0.9.4
 ```
 
-Mit `oc get pod` können wir nun verifizieren, dass der Operator Pod entfernt wurde.
+With `oc get pod` we can now verify that the operator pod has been removed.
 
 
-## Weiterführende Informationen
+## Further information
 
-* [OpenShift Dokumentation zu Operators](https://docs.openshift.com/container-platform/latest/operators/understanding/olm-what-operators-are.html)
-* [Buch von O'Reilly über Operators](https://www.redhat.com/cms/managed-files/cl-oreilly-kubernetes-operators-ebook-f21452-202001-en_2.pdf)
+* [OpenShift Operators documentation](https://docs.openshift.com/container-platform/latest/operators/understanding/olm-what-operators-are.html)
+* [Book from O'Reilly about Operators](https://www.redhat.com/cms/managed-files/cl-oreilly-kubernetes-operators-ebook-f21452-202001-en_2.pdf)
 
 ---
 
@@ -224,4 +224,4 @@ __Ende Lab 7__
 
 <p width="100px" align="right"><a href="08_troubleshooting_ops.md">Troubleshooting →</a></p>
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)
