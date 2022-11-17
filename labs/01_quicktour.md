@@ -39,7 +39,7 @@ Built container images are versioned in an image registry (analogous to a reposi
 Container images can also be built on OpenShift itself, from where they are pushed to the OpenShift internal registry and pulled again for deployment.
 
 
-## OpenShift-Konzepte
+## OpenShift-Concepts
 ### Projects
 
 In OpenShift, resources (containers and container images, pods, services, routes, configuration, quotas and limits, etc.) are structured in projects. From a technical perspective, a project corresponds to a Kubernetes namespace and extends it with certain concepts.

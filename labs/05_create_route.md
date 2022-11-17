@@ -1,40 +1,40 @@
-# Lab 5: Routen erstellen
+# Lab 5: Create Route
 
-In diesem Lab werden wir die Applikation aus [Lab 4](04_deploy_dockerimage.md) über das HTTP-Protokoll vom Internet her erreichbar machen.
+In this lab, we will make the application from [Lab 4](04_deploy_dockerimage.md) accessible from the Internet using the HTTP protocol.
 
 
-## Routen
+## Routes
 
-Der `oc new-app` Befehl aus dem vorherigen [Lab](04_deploy_dockerimage.md) erstellt keine Route.
-Somit ist unser Service von _aussen_ her gar nicht erreichbar.
-Will man einen Service verfügbar machen, muss dafür eine Route eingerichtet werden.
-Der OpenShift Router erkennt aufgrund des Host Headers, auf welchen Service ein Request geleitet werden muss.
+The `oc new-app` command from the previous [Lab](04_deploy_dockerimage.md) does not create a route.
+Thus, our service is not accessible from _outside_ at all.
+If you want to make a service available, you have to create a route for it.
+The OpenShift router recognizes which service to route a request to based on the host header.
 
-Aktuell werden folgende Protokolle unterstützt:
+Currently the following protocols are supported:
 
 - HTTP
-- HTTPS mit [SNI](https://en.wikipedia.org/wiki/Server_Name_Indication)
-- TLS mit [SNI](https://en.wikipedia.org/wiki/Server_Name_Indication)
+- HTTPS with [SNI](https://en.wikipedia.org/wiki/Server_Name_Indication)
+- TLS with [SNI](https://en.wikipedia.org/wiki/Server_Name_Indication)
 - WebSockets
 
 
-## Aufgabe 1: Route erstellen
+## Task 1: Crate Route
 
-Vergewissern Sie sich, dass Sie sich im Projekt `[USERNAME]-dockerimage` befinden.
+Make sure that you are in the `[USERNAME]-dockerimage` project.
 
-<details><summary><b>Tipp</b></summary>oc project [USERNAME]-dockerimage</details><br/>
+<details><summary><b>Hint</b></summary>oc project [USERNAME]-dockerimage</details><br/>
 
-Erstellen Sie für den Service `example-spring-boot` eine Route und machen Sie ihn darüber öffentlich verfügbar.
+Create a route for the `example-spring-boot` service and make it publicly available through it.
 
-__Tipp__:
-Mittels `oc get routes` können Sie sich die Routen eines Projekts anzeigen lassen.
+__Hint__:
+By means of `oc get routes` you can display the routes of a project.
 
 ```bash
 oc get routes
 No resources found.
 ```
 
-Aktuell gibt es noch keine Route. Jetzt brauchen wir den Servicenamen:
+Currently there is no route yet. Now we need the service name:
 
 ```bash
 oc get services
@@ -42,20 +42,20 @@ NAME                  TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          
 example-spring-boot   ClusterIP   172.30.9.146   <none>        8080/TCP,8778/TCP,9000/TCP,9779/TCP   16m
 ```
 
-Und nun wollen wir diesen Service veröffentlichen bzw. exponieren:
+And now we want to publish or expose this service:
 
 ```bash
 oc expose service example-spring-boot
 ```
 
-Mit diesem Befehl wird eine unverschlüsselte Route erstellt, also via HTTP erreichbar.
-Um eine verschlüsselte Route zu erstellen schreiben wir folgendes:
+This command creates an unencrypted route, i.e. reachable via HTTP.
+To create an encrypted route, we write the following:
 
 ```bash
 oc create route edge example-spring-boot-secure --service=example-spring-boot
 ```
 
-Mittels `oc get routes` können wir überprüfen, ob die Routen angelegt wurden.
+Using `oc get routes` we can check if the routes have been created.
 
 ```bash
 oc get routes
@@ -64,19 +64,19 @@ example-spring-boot          example-spring-boot-techlab.mycluster.com          
 example-spring-boot-secure   example-spring-boot-secure-techlab.mycluster.com            example-spring-boot   8080-tcp   edge          None
 ```
 
-Die Applikation ist nun vom Internet her über die angegebenen URLs erreichbar, Sie können also nun auf die Applikation zugreifen.
+The application is now accessible from the Internet via the specified URLs, so you can now access the application.
 
-__Tipp__:
-Wird mit `oc expose` oder `oc create route` kein expliziter Hostname angegeben, wird _servicename-project.applicationdomain_ verwendet.
+__Hint__:
+If no explicit hostname is specified with `oc expose` or `oc create route`, _servicename-project.applicationdomain_ is used.
 
-In der Übersicht der Web Console ist diese Route mit dem Hostname jetzt auch sichtbar (das Symbol oben rechts am blauen Ring).
+In the Web Console overview, this route with the hostname is now also visible (the icon at the top right of the blue ring).
 
-Öffnen Sie die Applikation im Browser und fügen ein paar "Say Hello" Einträge ein.
+Open the application in the browser and add a few "Say Hello" entries.
 
 ---
 
 __Ende Lab 5__
 
-<p width="100px" align="right"><a href="06_scale.md">Skalieren →</a></p>
+<p width="100px" align="right"><a href="06_scale.md">Scaling →</a></p>
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)

@@ -1,27 +1,27 @@
-# Lab 6: Pod Scaling, Readiness Probe und Self Healing
+# Lab 6: Pod Scaling, Readiness Probe 3nd and Self Healing
 
-In diesem Lab zeigen wir auf, wie man Applikationen in OpenShift skaliert.
-Des Weiteren zeigen wir, wie OpenShift dafür sorgt, dass jeweils die Anzahl erwarteter Pods gestartet wird und wie eine Applikation der Plattform zurückmelden kann, dass sie bereit für Requests ist.
+In this lab we will show how to scale applications in OpenShift.
+We will also show how OpenShift ensures that the number of expected pods is started and how an application can report back to the platform that it is ready for requests.
 
-## Aufgabe 1: Beispiel-Applikation hochskalieren
+## Task 1: Scale up the Example-Application 
 
-Dafür erstellen wir ein neues Projekt mit dem Namen `[USERNAME]-scale`.
+For this we create a new project with the name `[USERNAME]-scale`.
 
-<details><summary><b>Tipp</b></summary>oc new-project [USERNAME]-scale</details><br/>
+<details><summary><b>Hint</b></summary>oc new-project [USERNAME]-scale</details><br/>
 
-Fügen Sie dem Projekt eine Applikation hinzu:
+Add an application to the project:
 
 ```bash
 oc new-app appuio/example-php-docker-helloworld --name=appuio-php-docker --as-deployment-config
 ```
 
-Und stellen den Service `appuio-php-docker` zur Verfügung (expose).
+And provide the service `appuio-php-docker` (expose).
 
-<details><summary><b>Tipp</b></summary>oc expose service appuio-php-docker</details><br/>
+<details><summary><b>Hint</b></summary>oc expose service appuio-php-docker</details><br/>
 
-Wenn wir unsere Beispiel-Applikation skalieren wollen, müssen wir unserem ReplicationController (rc) mitteilen, dass wir bspw. stets 3 Replicas des Image am laufen haben wollen.
+If we want to scale our example application, we need to tell our ReplicationController (rc) that we want to have, for example, 3 replicas of the image running at all times.
 
-Schauen wir uns mal den ReplicationController (rc) etwas genauer an:
+Let's take a closer look at the ReplicationController (rc):
 
 ```bash
 oc get rc
@@ -29,23 +29,23 @@ NAME                  DESIRED   CURRENT   AGE
 appuio-php-docker-1   1         1         33s
 ```
 
-Für mehr Details json- oder yaml-Output ausgeben lassen.
+For more details output json or yaml output.
 
-<details><summary><b>Tipp</b></summary>oc get rc appuio-php-docker-1 -o json<br/>oc get rc appuio-php-docker-1 -o yaml</details><br/>
+<details><summary><b>Hint</b></summary>oc get rc appuio-php-docker-1 -o json<br/>oc get rc appuio-php-docker-1 -o yaml</details><br/>
 
-Der rc sagt uns, wieviele Pods wir erwarten (spec) und wieviele aktuell deployt sind (status).
+The rc tells us how many pods we expect (spec) and how many are currently deployed (status).
 
 
-## Aufgabe 2: Skalieren unserer Beispiel Applikation
+## Task 2: Scaling our sample application
 
-Nun skalieren wir unsere Beispiel-Applikation auf 3 Replicas.
-Der soeben betrachtete ReplicationController wird über die DeploymentConfig (dc) gesteuert, weshalb wir diese skalieren müssen, damit die gewünschte Anzahl Repclias vom rc übernommen wird:
+Now we scale our example application to 3 replicas.
+The ReplicationController we just looked at is controlled by the DeploymentConfig (dc), which is why we need to scale it so that the desired number of replicas is taken over by the rc:
 
 ```bash
 oc scale --replicas=3 dc/appuio-php-docker
 ```
 
-Überprüfen wir die Anzahl Replicas auf dem ReplicationController:
+Let's check the number of replicas on the ReplicationController:
 
 ```bash
 oc get rc
@@ -53,7 +53,7 @@ NAME                  DESIRED   CURRENT   AGE
 appuio-php-docker-1   3         3         1m
 ```
 
-und zeigen die Pods an:
+and display the pods:
 
 ```bash
 oc get pods
@@ -63,7 +63,7 @@ appuio-php-docker-1-evcre   1/1       Running   0          21s
 appuio-php-docker-1-tolpx   1/1       Running   0          2m
 ```
 
-Zum Schluss schauen wir uns den Service an. Der sollte jetzt alle drei Endpoints referenzieren:
+Finally, let's look at the service. It should now reference all three endpoints:
 
 ```bash
 $ oc describe svc appuio-php-docker
@@ -84,27 +84,27 @@ Session Affinity:  None
 Events:            <none>
 ```
 
-Skalieren von Pods innerhalb eines Service ist sehr schnell, da OpenShift einfach eine neue Instanz des Container Images als Container startet.
+Scaling pods within a service is very fast because OpenShift simply launches a new instance of the container image as a container.
 
-__Tipp__:
-OpenShift unterstützt auch [Autoscaling](https://docs.openshift.com/container-platform/latest/nodes/pods/nodes-pods-autoscaling.html).
-
-
-## Aufgabe 3: Skalierte App in der Web Console
-
-Schauen Sie sich die skalierte Applikation auch in der Web Console an.
-Wie können Sie die Anzahl Replicas via Web Console steuern?
+__Hint__:
+OpenShift also supports[Autoscaling](https://docs.openshift.com/container-platform/latest/nodes/pods/nodes-pods-autoscaling.html).
 
 
-## Unterbruchsfreies Skalieren überprüfen
+## Task 3: Scaled app in the Web Console
 
-Mit dem folgenden Befehl können Sie nun überprüfen, ob Ihr Service verfügbar ist, während Sie hoch- und herunterskalieren.
-Führen Sie folgenden Befehl in einem Terminal-Fenster aus und lassen ihn laufen, während Sie später skalieren.
+Take a look at the scaled application in the Web Console as well.
+How can you control the number of replicas via Web Console?
 
-Ersetzen Sie `[HOSTNAME]` mit dem Hostname Ihrer definierten Route:
 
-__Tipp__:
-Um den entsprechenden Hostname anzuzeigen, kann folgender Befehl verwendet werden:
+## Check interruption-free scaling
+
+You can now use the following command to verify that your service is available while you scale up and down.
+Run the following command in a terminal window and let it run while you scale up later.
+
+Replace `[HOSTNAME]` with the hostname of your defined route:
+
+__Hint__:
+To display the corresponding hostname, the following command can be used:
 
 `oc get route -o custom-columns=NAME:.metadata.name,HOSTNAME:.spec.host`
 
@@ -112,7 +112,7 @@ Um den entsprechenden Hostname anzuzeigen, kann folgender Befehl verwendet werde
 while true; do sleep 1; ( { curl -fs http://[HOSTNAME]/health/; date "+ TIME: %H:%M:%S,%3N" ;} & ) 2>/dev/null; done
 ```
 
-oder in PowerShell (__Achtung__: erst ab PowerShell-Version 3.0!):
+or in PowerShell (__caution__: only from PowerShell version 3.0 upwards!):
 
 ```bash
 while(1) {
@@ -122,7 +122,7 @@ while(1) {
 }
 ```
 
-Der Output zeigt jeweils den Pod an, der den Request beantwortet hatte:
+The output shows the pod that responded to the request:
 
 ```bash
 POD: appuio-php-docker-6-9w9t4 TIME: 16:40:04,991
@@ -141,19 +141,19 @@ POD: appuio-php-docker-6-6xg2b TIME: 16:40:17,543
 POD: appuio-php-docker-6-6xg2b TIME: 16:40:18,591
 ```
 
-Skalieren Sie nun von __3__ Replicas auf __1__ währenddem die While-Schleife läuft.
+Now scale from __3__ replicas to __1__ while the While loop is running.
 
-Die Requests werden an die unterschiedlichen Pods aufgeteilt.
-Sobald die Pods herunterskaliert wurden, gibt nur noch einer Antwort.
+The requests are distributed to the different pods.
+Once the pods have been scaled down, only one responds.
 
-Was passiert nun, wenn wir während der noch immer laufenden While-Schleife ein neues Deployment starten?
-Testen wir es:
+Now what happens if we start a new deployment while the While loop is still running?
+Let's test it:
 
 ```bash
 oc rollout latest appuio-php-docker
 ```
 
-Wie der Timestamp am Ende der Ausgabe zeigt, gibt während einer kurzen Zeit die öffentliche Route keine Antwort:
+As the timestamp at the end of the output shows, during a short time the public route does not give an answer:
 
 ```bash
 POD: appuio-php-docker-6-6xg2b TIME: 16:42:17,743
@@ -164,7 +164,7 @@ POD: appuio-php-docker-6-6xg2b TIME: 16:42:21,891
 POD: appuio-php-docker-6-6xg2b TIME: 16:42:22,943
 POD: appuio-php-docker-6-6xg2b TIME: 16:42:23,980
 #
-# keine Antwort
+# no answer
 #
 POD: appuio-php-docker-7-pxnr3 TIME: 16:42:42,134
 POD: appuio-php-docker-7-pxnr3 TIME: 16:42:43,181
@@ -177,45 +177,45 @@ POD: appuio-php-docker-7-pxnr3 TIME: 16:42:49,645
 POD: appuio-php-docker-7-pxnr3 TIME: 16:42:50,684
 ```
 
-In unserem Beispiel verwenden wir einen sehr leichtgewichtigen Pod.
-Der Ausfall wäre ausgeprägter, wenn der Container länger bräuchte, bis er Requests abarbeiten kann, bspw. die Java Applikation von LAB 4 (__Startup: 30 Sekunden__).
+In our example, we use a very lightweight pod.
+The failure would be more pronounced if the container took longer to process requests, e.g. the Java application of LAB 4 (__Startup: 30 seconds__).
 
-Es kann sogar passieren, dass der Service gar nicht mehr online ist und der Routing Layer als Response einen __503 Error__ zurück gibt.
+It can even happen that the service is no longer online and the routing layer returns a __503 error__ as a response.
 
-Im folgenden Kapitel wird beschrieben, wie Sie Ihre Services konfigurieren können, damit unterbruchsfreie Deployments möglich werden.
+The following chapter describes how you can configure your services to enable interruption-free deployments.
 
 
-## Unterbruchsfreies Deployment dank Health Checks und Rolling Update
+## Uninterrupted deployment thanks to health checks and rolling update
 
-Die "[Rolling Strategy](https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html#deployments-rolling-strategy_deployment-strategies)" ermöglicht unterbruchsfreie Deployments.
-Damit wird die neue Version der Applikation gestartet, sobald die Applikation bereit ist, werden Requests auf den neuen Pod geleitet und die alte Version entfernt.
+The "[Rolling Strategy](https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html#deployments-rolling-strategy_deployment-strategies)" enables uninterrupted deployments.
+With this, the new version of the application is started, and as soon as the application is ready, requests are directed to the new pod and the old version is removed.
 
-Zusätzlich kann mittels [Container Health Checks](https://docs.openshift.com/container-platform/latest/applications/application-health.html#application-health-configuring_application-health) die deployte Applikation der Plattform detailliertes Feedback über ihr aktuelles Befinden übermitteln.
+In addition, [Container Health Checks](https://docs.openshift.com/container-platform/latest/applications/application-health.html#application-health-configuring_application-health) allows the deployed application to provide detailed feedback to the platform about its current health.
 
-Grundsätzlich gibt es zwei Arten von Health Checks, die implementiert werden können:
+Basically, there are two types of health checks that can be implemented:
 
-- Liveness Probe: Sagt aus, ob ein laufender Container immer noch sauber läuft
-- Readiness Probe: Gibt Feedback darüber, ob eine Applikation bereit ist, Requests zu empfangen
+- Liveness Probe: Tells if a running container is still running cleanly
+- Readiness Probe: Provides feedback on whether an application is ready to receive requests.
 
-Diese beiden Checks können als HTTP Check, Container Execution Check (Befehl oder z.B. Shell Script im Container) oder als TCP Socket Check implementiert werden.
+These two checks can be implemented as HTTP check, container execution check (command or e.g. shell script in container) or as TCP socket check.
 
-In unserem Beispiel soll die Applikation der Plattform sagen, ob sie bereit für Requests ist.
-Dafür verwenden wir die Readiness Probe. Unsere Beispielapplikation gibt unter dem Pfad `/health` einen Status Code 200 zurück, sobald die Applikation bereit ist.
+In our example, the application should tell the platform if it is ready for requests.
+For this we use the Readiness Probe. Our sample application returns a status code 200 under the path `/health` as soon as the application is ready.
 
 ```bash
 http://[route]/health/
 ```
 
 
-## Aufgabe 4: Readiness Probe
+## Task 4: Readiness Probe
 
-Fügen Sie die Readiness Probe mit folgendem Befehl in der DeploymentConfig (dc) hinzu:
+Add the Readiness Probe with the following command in the DeploymentConfig (dc):
 
 ```bash
 oc set probe dc/appuio-php-docker --readiness --get-url=http://:8080/health --initial-delay-seconds=10
 ```
 
-Ein Blick in die DeploymentConfig zeigt, dass nun folgender Eintrag unter `.spec.template.spec.containers` eingefügt wurde:
+A look into the DeploymentConfig shows that the following entry has now been added under `.spec.template.spec.containers`:
 
 ```yaml
 readinessProbe:
@@ -230,36 +230,36 @@ readinessProbe:
   timeoutSeconds: 1
 ```
 
-Verifizieren Sie während eines Deployments der Applikation, dass nun auch ein Update der Applikation unterbruchsfrei verläuft, indem Sie die bereits verwendete While-Schlaufe während des folgenden Update-Befehls beobachten:
+During a deployment of the application, verify that an update of the application now also runs without interruption by observing the while loop already used during the following update command:
 
 ```bash
 oc rollout latest appuio-php-docker
 ```
 
-Jetzt sollten die Antworten ohne Unterbruch vom neuen Pod kommen.
+Now the answers should come without interruption from the new pod.
 
 
 ## Self Healing
 
-Über den Replication Controller haben wir nun der Plattform mitgeteilt, dass jeweils __n__ Replicas laufen sollen. Was passiert nun, wenn wir einen Pod löschen?
+Through the Replication Controller, we have now told the platform to run __n__ replicas at a time. What happens now when we delete a pod?
 
-Suchen Sie mittels `oc get pods` einen Pod im Status "running" aus, den Sie _killen_ können.
+Using `oc get pods`, pick a pod in the "running" state that you can _kill_.
 
-Starten sie in einem eigenen Terminal den folgenden Befehl (anzeige der Änderungen an Pods)
+In a separate terminal, run the following command (displaying changes to pods)
 
 ```bash
 oc get pods -w
 ```
 
-Löschen Sie im anderen Terminal Pods mit folgendem Befehl:
+In the other terminal, delete Pods with the following command:
 
 ```bash
 oc delete pods -l deploymentconfig=appuio-php-docker
 ```
 
-OpenShift sorgt dafür, dass wieder __n__ Replicas des genannten Pods laufen.
+OpenShift makes sure that __n__ replicas of said pod are running again.
 
-In der Web Console ist gut zu beobachten, wie der Pod zuerst hellblau ist, bis die Readiness Probe meldet, dass die Applikation nun bereit ist.
+In the Web Console, it is easy to see how the pod is initially light blue until the Readiness Probe reports that the application is now ready.
 
 ---
 
@@ -267,4 +267,4 @@ __Ende Lab 6__
 
 <p width="100px" align="right"><a href="07_operators.md">Operators →</a></p>
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)
