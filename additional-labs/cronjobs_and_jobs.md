@@ -1,110 +1,111 @@
 # Cron Jobs in OpenShift
 
-Kubernetes bringt das Konzept von Jobs und Cron Jobs mit.
-Dies ermöglicht es, gewisse Tasks einmalig (Job) oder eben jeweils zu einer bestimmten Zeit (Cron Job) auszuführen.
+Kubernetes brings the concept of jobs and cron jobs.
+This makes it possible to execute certain tasks once (job) or at a certain time (cron job).
 
-Eine mögliche Auswahl von Anwendungsfällen:
+A possible selection of use cases:
 
-- Jeweils um 23:12 ein Datenbank Backup erstellen und auf ein gemountetes PVC speichern
-- Einmaliges generieren von Reports
-- Cleanup-Job welcher alte Daten aufräumt
-- Asynchrones Senden von Emails
+- Create a database backup every 23:12 and save it to a mounted PVC.
+- Generate reports once
+- Cleanup job which cleans up old data
+- Asynchronous sending of emails
 
 ## Job
 
-Jobs im Unterschied zu einem Deployment, welches mittels Replication Controller getrackt wird, führt einen Pod einmalig aus bis der Befehl abgeschlossen ist.
-Ein Job erstellt dafür einen Pod und führt die definierte Operation bzw. Befehl aus.
-Es muss sich dabei nicht zwingend um nur einen Pod handeln, sondern kann auch mehrere beinhalten.
-Wird ein Job gelöscht, werden auch die vom Job gestarteten (und wieder beendeten) Pods gelöscht.
+Jobs, unlike a deployment that is tracked by the Replication Controller, run a Pod once until the command completes.
+A job creates a pod and executes the defined operation or command.
+This does not necessarily have to be just one Pod, but can also include several.
+If a job is deleted, the pods started (and ended) by the job are also deleted.
 
-Ein Job eignet sich also bspw. dafür, sicherzustellen, dass ein Pod verlässlich bis zu dessen Vervollständigung ausgeführt wird.
-Schlägt ein Pod fehl, zum Beispiel wegen eines Node-Fehlers, startet der Job einen neuen Pod.
+A job can therefore be used, for example, to ensure that a pod is reliably executed until it is completed.
+If a pod fails, for example because of a node error, the job starts a new pod.
 
-Weitere Informationen zu Jobs sind in der [OpenShift Dokumentation](https://docs.openshift.com/container-platform/latest/nodes/jobs/nodes-nodes-jobs.html) zu finden.
+More information about jobs can be found in the [OpenShift Documentation](https://docs.openshift.com/container-platform/latest/nodes/jobs/nodes-nodes-jobs.html).
 
 ## Cron Jobs
 
-Ein OpenShift Cron Job ist nichts anderes als eine Ressource, welche zu definierten Zeitpunkten einen Job erstellt, welcher wiederum wie gewohnt einen Pod startet um einen Befehl auszuführen.
+An OpenShift Cron job is nothing more than a resource that creates a job at defined times, which in turn starts a Pod as usual to execute a command.
 
-Weitere Informationen zu Cron Jobs sind auf derselben [OpenShift Dokumentationsseite](https://docs.openshift.com/container-platform/latest/nodes/jobs/nodes-nodes-jobs.html) zu finden wie die Jobs.
+More information about cron jobs can be found on the same [OpenShift documentation page](https://docs.openshift.com/container-platform/latest/nodes/jobs/nodes-nodes-jobs.html) as the jobs.
 
-## Aufgabe: Job für MariaDB-Dump erstellen
+## Task: Job für MariaDB-Dump erstellen
 
-Ähnlich wie in [Lab-Aufgabe 9.4](../labs/09_database.md) wollen wir nun einen Dump der laufenden MariaDB-Datenbank erstellen, aber ohne uns in den Pod einloggen zu müssen.
+Similar to [Lab-Task 9.4](../labs/09_database.md), we now want to create a dump of the running MariaDB database, but without having to log into the pod.
 
-Für dieses Beispiel verwenden wir das Spring Boot Beispiel aus [Lab 4](../labs/04_deploy_dockerimage.md), `[USERNAME]-dockerimage`.
+For this example we use the Spring Boot example from [Lab 4](../labs/04_deploy_dockerimage.md), `[USERNAME]-dockerimage`.
 
-<details><summary><b>Tipp</b></summary>oc project [USERNAME]-dockerimage</details>
+<details><summary><b>Hint</b></summary>oc project [USERNAME]-dockerimage</details>
 
-Schauen wir uns zuerst die Job-Ressource an, die wir erstellen wollen.
-Sie ist unter [resources/job_mariadb-dump.yaml](resources/job_mariadb-dump.yaml) zu finden.
-Unter `.spec.template.spec.containers[0].image` sehen wir, dass wir dasselbe Image verwenden wie für die laufende Datenbank selbst.
-Wir starten anschliessend aber keine Datenbank, sondern wollen einen `mysqldump`-Befehl ausführen, wie unter `.spec.template.spec.containers[0].command` aufgeführt.
-Dazu verwenden wir, wie schon im Datenbank-Deployment, dieselben Umgebungsvariablen, um Hostname, User oder Passwort innerhalb des Pods definieren zu können.
+First, let's take a look at the job resource we want to create.
+It can be found at [resources/job_mariadb-dump.yaml](resources/job_mariadb-dump.yaml).
+Under `.spec.template.spec.containers[0].image` we see that we use the same image as for the running database itself.
+However, we do not start a database afterwards, but want to execute a `mysqldump` command, as listed under `.spec.template.spec.containers[0].command`.
+To do this, we use the same environment variables as in the database deployment, to be able to define hostname, user or password within the pod.
 
-Schlägt der Job fehl, soll er neugestartet werden, dies wird über die `restartPolicy` definiert.
-Insgesamt soll 3 mal probiert werden den Job auszuführen (`backoffLimit`).
+If the job fails, it should be restarted, this is defined by the `restartPolicy`.
+The job should be tried 3 times in total (`backoffLimit`).
 
-Erstellen wir nun also unseren Job:
+So now let's create our job:
 
 ```bash
 oc create -f ./additional-labs/resources/job_mariadb-dump.yaml
 ```
 
-Überprüfen wir, ob der Job erfolgreich war:
+Let's check if the job was successful:
 
 ```bash
 oc describe jobs/mariadb-dump
 ```
 
-Den ausgeführten Pod können wir wie folgt anschauen:
+We can look at the executed pod as follows:
 
 ```bash
 oc get pods
 ```
 
-Um alle Pods, welche zu einem Job gehören, in maschinenlesbarer Form auszugeben, kann bspw. folgender Befehl verwendet werden:
+To output all pods belonging to a job in machine-readable form, the following command can be used, for example:
 
 ```bash
 oc get pods --selector=job-name=mariadb-dump --output=jsonpath={.items..metadata.name}
 ```
 
-Um zu überprüfen ob der Job erfolgreich war, können die Logs des Pod ausgelesen werden.
+To check if the job was successful, the logs of the Pod can be read.
 
 ```bash
 oc logs $(oc get pods --selector=job-name=mariadb-dump --output=jsonpath={.items..metadata.name})
 ```
 
 
-## Aufgabe: Cron Job einrichten
+## Task: Set up cron job
 
-In der vorherigen Aufgabe haben wir lediglich einen Job instanziert, welcher einmalig einen Datenbank Dump erstellt.
-Nun wollen wir sicherstellen, dass dieser Datebank Dump nächtlich einmal ausgeführt wird.
+In the previous task, we only instantiated a job that creates a database dump once.
+Now we want to make sure that this database dump is executed once a night.
 
-Dafür erstellen wir nun eine Resource vom Typ Cron Job. Der Cron Job soll jeweils um 23:12 jeden Tag einen Job ausführen, welcher einen Dump der Datenbank erstellt und sichert.
+For this purpose, we now create a resource of the type Cron Job. The cron job should execute a job at 23:12 every day, which creates and saves a database dump.
 
 ```bash
 oc create -f ./additional-labs/resources/cronjob_mariadb-dump.yaml
 ```
 
-Schauen wir uns nun diesen Cron Job an:
+Now let's take a look at this cron job:
 
 ```bash
 oc get cronjob mariadb-backup -o yaml
 ```
 
-__Wichtig__:
-Beachten Sie, dass insbesondere Backups überwacht und durch Restore Tests überprüft werden müssen.
-Diese Logik kann bspw. in den auszuführenden Befehl integriert oder aber durch ein Monitoring Tool übernommen werden.
-Im Test-Cron Job wird der Dump in das `/tmp`-Verzeichnis geschrieben.
-Für den produktiven Einsatz sollte dies ein gemountetes Persistent Volume sein.
+__Important__:
+Note that backups in particular must be monitored and checked by restore tests.
+This logic can be integrated into the command to be executed, for example, or taken over by a monitoring tool.
+In the test cron job, the dump is written to the `/tmp` directory.
+For productive use, this should be a mounted persistent volume.
 
-Versuchen Sie, folgende Fragen zu beantworten:
+Try to answer the following questions:
 
-- Wann wurde der Cron Job das letzte mal ausgeführt?
-- War das Backup erfolgreich?
-- Konnten die Daten erfolgreich restored werden?
+- When was the last time the cron job was run?
+- Was the backup successful?
+- Could the data be restored successfully?
 
 __Ende Lab Cron Jobs__
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)
+

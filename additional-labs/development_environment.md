@@ -1,24 +1,26 @@
-# OpenShift Entwicklungsumgebung
+# OpenShift development environment
 
-Diese Seite zeigt verschiedene Möglichkeiten, wie selbst entwickelte Container oder OpenShift Templates etc. getestet werden können, ohne auf eine vollständige, produktive OpenShift-Plattform wie bspw. APPUiO Zugriff zu haben.
+This page shows different ways to test self-developed containers or OpenShift templates etc. without having access to a full, production OpenShift platform like e.g. APPUiO.
 
 ## CodeReady Containers
 
-[CodeReady Containers](https://crc.dev/crc/) ermöglicht es, einen minimalen OpenShift 4 Cluster auf dem lokalen Computer laufen zu lassen.
+[CodeReady Containers](https://crc.dev/crc/) makes it possible to run a minimal OpenShift 4 cluster on the local machine.
 
 ## Minishift
 
-[Minishift](https://docs.okd.io/3.11/minishift/index.html) erlaubt den Betrieb einer lokalen OpenShift-Installation auf dem eigenen Notebook in einer VM mit KVM, Hyper-V oder VirtualBox, __ermöglicht aber nur den Einsatz von OpenShift 3, nicht OpenShift 4__.
-Minishift ist ursprünglich ein Fork von Minikube und verwendet [OKD](https://www.okd.io/), das Upstream-Projekt von OpenShift Container Platform.
-Für den Einsatz von OCP 3 muss auf das Red Hat CDK ausgewichen werden.
+[Minishift](https://docs.okd.io/3.11/minishift/index.html) allows you to run a local OpenShift installation on your own notebook in a VM using KVM, Hyper-V or VirtualBox, __but only allows you to use OpenShift 3, not OpenShift 4__.
+Minishift is originally a fork of Minikube and uses [OKD](https://www.okd.io/), the upstream project of OpenShift Container Platform.
+For the use of OCP 3, the Red Hat CDK must be used.
 
 ## CDK
 
-Das [Red Hat Container Development Kit](https://developers.redhat.com/products/cdk/overview) bietet sozusagen die "Enterprise"-Variante von Minishift an.
-Anstelle von OKD kommt OCP zum Einsatz, weshalb eine Subscription benötigt wird, bspw. über das kostenlose [Red Hat Developer Program](https://developers.redhat.com/).
+The [Red Hat Container Development Kit](https://developers.redhat.com/products/cdk/overview) offers the "enterprise" variant of Minishift, so to speak.
+Instead of OKD, OCP is used, which is why a subscription is required, e.g. via the free [Red Hat Developer Program](https://developers.redhat.com/).
 
 ---
 
-__Ende__
+__End__
 
-[← zurück zur Übersicht](../README.md)
+
+[← back to the overview](../README.md)
+

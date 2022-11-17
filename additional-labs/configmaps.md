@@ -1,33 +1,33 @@
 # ConfigMaps
 
-ConfigMaps werden dazu verwendet, die Konfiguration für eine Applikation vom Image zu trennen und bei Laufzeit dem Pod zur Verfügung zu stellen, ähnlich dem Setzen von Umgebungsvariablen.
-Dies erlaubt es, Applikationen innerhalb von Containern möglichst portabel zu halten.
+ConfigMaps are used to separate the configuration for an application from the image and make it available to the pod at runtime, similar to setting environment variables.
+This allows applications to be kept as portable as possible within containers.
 
-In diesem Lab lernen Sie, wie man ConfigMaps erstellt und entsprechend verwendet.
+In this lab, you will learn how to create ConfigMaps and use them accordingly.
 
-## ConfigMap in OpenShift Projekt anlegen
+## Create ConfigMap in OpenShift project
 
-Um eine ConfigMap in einem Projekt anzulegen kann folgender Befehl verwendet werden:
+To create a ConfigMap in a project the following command can be used:
 
 ```bash
 oc create configmap [Name der ConfigMap] [Options]
 ```
 
-## Java Properties Files als ConfigMap
+## Java Properties Files as a ConfigMap
 
-Ein klassisches Beispiel für ConfigMaps sind Property Files bei Java Applikationen, welche in erster Linie nicht via Umgebungsvariablen konfiguriert werden können.
+A classic example for ConfigMaps are property files in Java applications, which primarily cannot be configured via environment variables.
 
-Für dieses Beispiel verwenden wir das Spring Boot Beispiel aus [Lab 4](../labs/04_deploy_dockerimage.md), `[USERNAME]-dockerimage`.
+For this example we use the Spring Boot example from [Lab 4](../labs/04_deploy_dockerimage.md), `[USERNAME]-dockerimage`.
 
-<details><summary><b>Tipp</b></summary>oc project [USERNAME]-dockerimage</details>
+<details><summary><b>Hint</b></summary>oc project [USERNAME]-dockerimage</details>
 
-Mit dem folgenden Befehl legen wir nun die erste ConfigMap auf Basis eines lokalen Files an:
+With the following command we now create the first ConfigMap based on a local file:
 
 ```bash
 oc create configmap javaconfiguration --from-file=additional-labs/resources/properties.properties
 ```
 
-Mit folgendem Befehl kann nun verifiziert werden, ob die ConfigMap erfolgreich angelegt wurde:
+The following command can now be used to verify that the ConfigMap was successfully created:
 
 ```bash
 oc get configmaps
@@ -35,27 +35,27 @@ NAME                DATA   AGE
 javaconfiguration   1      7s
 ```
 
-Wir können uns auch den Inhalt der ConfigMap ansehen:
+We can also look at the contents of the ConfigMap:
 
 ```bash
 oc get configmaps javaconfiguration -o json
 ```
 
-## ConfigMap in Pod zur Verfügung stellen
+## Provide ConfigMap in Pod
 
-Als nächstes wollen wir die ConfigMap im Pod verfügbar machen.
+Next, we want to make the ConfigMap available in the pod.
 
-Grundsätzlich gibt es dafür die folgenden Möglichkeiten:
+Basically there are the following possibilities:
 
-- ConfigMap Properties als Umgebungsvariablen im Deployment
-- Commandline Arguments via Umgebungsvariablen
-- als Volumes in den Container gemountet
+- ConfigMap Properties as environment variables in the deployment.
+- Commandline Arguments via environment variables
+- mounted as volumes in the container
 
-Im Beispiel hier wollen wir, dass die ConfigMap als File auf einem Volume liegt.
+In the example here, we want the ConfigMap to be a file on a volume.
 
-Hierfür müssen wir entweder den Pod oder in unserem Fall die DeploymentConfig mit `oc edit dc example-spring-boot` bearbeiten.
+For this we need to edit either the pod or in our case the DeploymentConfig with `oc edit dc example-spring-boot`.
 
-Zu beachten gilt es dabei den volumeMounts- (`spec.template.spec.containers.volumeMounts`: wie wird das Volume in den Container gemountet) sowie den volumes-Teil (`spec.template.spec.volumes`: welches Volume in unserem Fall die ConfigMap wird in den Container gemountet).
+The volumeMounts part (`spec.template.spec.containers.volumeMounts`: how to mount the volume into the container) and the volumes part (`spec.template.spec.volumes`: which volume in our case the ConfigMap will be mounted into the container) have to be considered.
 
 ```
 apiVersion: v1
@@ -128,7 +128,7 @@ spec:
         name: config-volume
 ```
 
-Anschliessend kann im Container im File `/etc/config/properties.properties` auf die Werte zugegriffen werden.
+Afterwards the values can be accessed in the container in the file `/etc/config/properties.properties`.
 
 ```bash
 oc exec [POD] -- cat /etc/config/properties.properties
@@ -136,17 +136,17 @@ key=appuio
 key2=openshift
 ```
 
-Diese Properties Files können nun so von der Java Applikation im Container gelesen und verwendet werden.
-Das Image bleibt dabei umgebungsneutral.
+These properties files can now be read and used by the Java application in the container.
+The image remains environment-neutral.
 
-## Aufgabe: LAB10.4.1 ConfigMap Data Sources
+## Task: LAB10.4.1 ConfigMap Data Sources
 
-Erstellen Sie jeweils eine ConfigMap und verwenden Sie dafür die verschiedenen Arten von [Data Sources](https://docs.openshift.com/container-platform/3.11/dev_guide/configmaps.html#consuming-configmap-in-pods).
+Create a ConfigMap for each and use the different types of [Data Sources](https://docs.openshift.com/container-platform/3.11/dev_guide/configmaps.html#consuming-configmap-in-pods).
 
-Machen Sie die Werte innerhalb von Pods auf die unterschiedlichen Arten verfügbar.
+Make the values within Pods available in the different ways.
 
 ---
 
-__Ende Lab ConfigMaps__
+__End Lab ConfigMaps__
 
-[← zurück zur Übersicht](../README.md)
+[← back to the overview](../README.md)
