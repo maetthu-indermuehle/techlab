@@ -24,7 +24,7 @@ __Goals of this Techlab__:
 9. [Database deployment and connection](labs/09_database.md)
 10. [Persistent Storage connection and usage for the Database](labs/10_persistent_storage.md)
 11. [Code changes integration via Webhook](labs/11_dockerbuild_webhook.md)
-12. [Applikationstemplates](labs/12_template.md)
+12. [Application templates](labs/12_template.md)
 13. [Build your own Templates](labs/13_template_creation.md)
 
 ### Additional Labs
